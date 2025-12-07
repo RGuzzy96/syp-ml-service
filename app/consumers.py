@@ -32,7 +32,7 @@ def start_consumer():
 
             response_message = {
                 "status": "success",
-                "user_id": message["userId"],
+                "user_id": message["user_id"],
                 "results": results
             }
 

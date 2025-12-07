@@ -4,12 +4,22 @@ from sklearn.model_selection import train_test_split
 from torchvision import datasets, transforms
 from torch.utils.data import DataLoader
 
+# -----------------------------------
+#   Dataset Loading Functions
+#   - currently only supporting a few, pre-selected datasets
+#   - ideally, a user could bring their own dataset in future versions
+#   - this raises challenges around data format, preprocessing, etc, and then in the ML loop itself
+#     - this could warrant an entirely new project for follow on SYP classes
+# -----------------------------------
 def load_dataset(name: str):
     print(f"Loading dataset: {name}")
     name = name.lower().strip()
 
     if name in ["wine", "wine quality"]:
         return load_wine_quality_dataset()
+    
+    if name in ("iris", "iris dataset"):
+        return load_iris_dataset()
     
     if name in ("tumor", "tumor images", "image tumor"):
         return load_tumor_image_dataset()
@@ -34,6 +44,28 @@ def load_wine_quality_dataset():
     print("Features standardized.")
 
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+    print("Dataset split into train and test sets.")
+
+    return X_train, y_train, X_test, y_test
+
+def load_iris_dataset():
+    from sklearn.datasets import load_iris
+
+    print("Loading Iris dataset...")
+
+    data = load_iris()
+    X = data.data       # shape (150, 4)
+    y = data.target     # 3 classes
+
+    print("Dataset loaded with shape:", X.shape)
+
+    scaler = StandardScaler()
+    X = scaler.fit_transform(X)
+    print("Features standardized.")
+
+    X_train, X_test, y_train, y_test = train_test_split(
+        X, y, test_size=0.2, random_state=42, stratify=y
+    )
     print("Dataset split into train and test sets.")
 
     return X_train, y_train, X_test, y_test
