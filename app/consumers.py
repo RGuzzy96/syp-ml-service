@@ -19,13 +19,11 @@ def start_consumer():
     channel.queue_declare(queue=queue_name, durable=True)
 
     def callback(ch: BlockingChannel, method, properties: pika.BasicProperties, body):
-        print("Received message:", body)
         try:
             message = json.loads(body)
             
             print("Running experiment pipeline with config:", message)
             results = run_experiment_pipeline(message)
-            print("Experiment completed with results:", results)
 
             correlation_id = properties.correlation_id
             reply_to = properties.reply_to
@@ -33,10 +31,9 @@ def start_consumer():
             response_message = {
                 "status": "success",
                 "user_id": message["user_id"],
+                "experiment_id": message["experiment_id"],
                 "results": results
             }
-
-            print("Sending response:", response_message)
 
             if reply_to and correlation_id:
                 ch.basic_publish(
